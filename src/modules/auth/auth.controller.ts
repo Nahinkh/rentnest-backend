@@ -52,6 +52,23 @@ const getProfile = catchAsync(async(req:Request, res:Response) => {
         data:user,
     })
 })
+const logout = catchAsync(async (req, res) => {
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: envConfig.node_env === "production",
+    sameSite:
+      envConfig.node_env === "production"
+        ? "none"
+        : "lax",
+  });
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Logged out successfully",
+    data: null,
+  });
+});
 
 const refreshToken = catchAsync(async(req:Request, res:Response) => {
     const refreshToken = req.cookies.refreshToken;
@@ -76,4 +93,5 @@ export const authController = {
     loginUser,
     getProfile,
     refreshToken,
+    logout
 }

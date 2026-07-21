@@ -10,5 +10,6 @@ router.post("/register",validateRequest(validateRegister), authController.create
 router.post("/login",validateRequest(validateLogin), authController.loginUser)
 router.post("/refresh-token", authController.refreshToken)
 router.get("/profile",auth(), authController.getProfile)
+router.post("/logout", auth(), authController.logout)
 
 export const authRoutes = router;
