@@ -1,6 +1,6 @@
 import app from "./app";
 import envConfig from "./config/envConfig";
-import { prisma } from "./db/client";
+import { prisma } from "./db";
 
 const PORT = envConfig.port;
 
