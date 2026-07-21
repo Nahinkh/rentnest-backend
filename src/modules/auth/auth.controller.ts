@@ -43,9 +43,37 @@ const loginUser = catchAsync(async(req:Request, res:Response) => {
     })
 })
 
+const getProfile = catchAsync(async(req:Request, res:Response) => {
+    const user = await authService.getProfile(req.user?.id as string);
+    sendResponse(res,{
+        success:true,
+        statusCode:httpStatus.OK,
+        message:"User profile fetched successfully",
+        data:user,
+    })
+})
+
+const refreshToken = catchAsync(async(req:Request, res:Response) => {
+    const refreshToken = req.cookies.refreshToken;
+    const {accessToken} = await authService.refreshToken(refreshToken);
+    res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: envConfig.node_env === "production",
+        sameSite: "none",
+        maxAge: 1000 * 60 * 60 * 24, // 1 day
+    });  
+    sendResponse(res,{
+        success:true,
+        statusCode:httpStatus.OK,
+        message:"Access token refreshed successfully",
+    })
+})
+
 
 
 export const authController = {
     createUser,
-    loginUser
+    loginUser,
+    getProfile,
+    refreshToken,
 }
