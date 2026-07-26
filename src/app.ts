@@ -7,6 +7,7 @@ import { authRoutes } from "./modules/auth/auth.route";
 import notFound from "./middleware/notFound";
 import globalErrorHandler from "./middleware/globalErrorHandler";
 import 'dotenv/config'
+import { propertyRoute } from "./modules/property/property.route";
 
 app.use(cors({
     origin: envConfig.app_url,
@@ -17,12 +18,13 @@ app.use(express.urlencoded({ extended : true }));
 app.use(cookieParser());
 
 app.use("/api/auth",authRoutes);
+app.use("/api/landlord/properties", propertyRoute);
 
 app.use(globalErrorHandler);
 app.use(notFound);
 
 app.get("/",(req : Request, res : Response) => {
-    res.send("Hello, World! From Rentnest Backend Server");
+    res.send("Hello, World! From RentNest Backend Server");
 });
 
 export default app;
