@@ -1,62 +1,162 @@
+import { Prisma } from "../../../generated/prisma/client";
 import { prisma } from "../../db";
+import { PaginationOptions } from "../../interfaces/pagination";
+import { paginationCalculate } from "../../utils/pagination";
 import { categoryService } from "../category/category.service";
-import { IProperty } from "./property.interface";
+import { propertySearchableFields } from "./property.constant";
+import { IProperty, PropertyFilters } from "./property.interface";
 
 const createProperty = async (userId: string, propertyData: IProperty) => {
-    return await prisma.$transaction(async (tx) => {
-        let category = await categoryService.createCategory(tx, propertyData.category);
+  return await prisma.$transaction(async (tx) => {
+    let category = await categoryService.createCategory(
+      tx,
+      propertyData.category,
+    );
 
-        if (!category) {
-            category = await tx.category.create({
-                data: {
-                    name: propertyData.category.name,
-                    slug: propertyData.category.name.toLowerCase().replace(/\s+/g, '-'),
-                    description: propertyData.category.description || null,
-                },
-            });
-        }
-
-        const property = await tx.property.create({
-            data: {
-                title: propertyData.title,
-                description: propertyData.description,
-                rentPrice: propertyData.rentPrice,
-                bedrooms: propertyData.bedrooms,
-                bathrooms: propertyData.bathrooms,
-                area: propertyData.area || null,
-                address: propertyData.address,
-                city: propertyData.city,
-                division: propertyData.division,
-                latitude: propertyData.latitude || null,
-                longitude: propertyData.longitude || null,
-                landlord:{
-                    connect: {
-                        id: userId
-                    }
-                },
-                category: {
-                    connect: {
-                        id: category.id
-                    }
-            },
+    if (!category) {
+      category = await tx.category.create({
+        data: {
+          name: propertyData.category.name,
+          slug: propertyData.category.name.toLowerCase().replace(/\s+/g, "-"),
+          description: propertyData.category.description || null,
         },
-        include:{
-            category: true,
-            landlord:{
-                select:{
-                    id: true,
-                    name: true,
-                    email: true
-                }
+      });
+    }
+
+    const property = await tx.property.create({
+      data: {
+        title: propertyData.title,
+        description: propertyData.description,
+        rentPrice: propertyData.rentPrice,
+        bedrooms: propertyData.bedrooms,
+        bathrooms: propertyData.bathrooms,
+        area: propertyData.area || null,
+        address: propertyData.address,
+        city: propertyData.city,
+        division: propertyData.division,
+        latitude: propertyData.latitude || null,
+        longitude: propertyData.longitude || null,
+        landlord: {
+          connect: {
+            id: userId,
+          },
+        },
+        category: {
+          connect: {
+            id: category.id,
+          },
+        },
+      },
+      include: {
+        category: true,
+        landlord: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+    return property;
+  });
+};
+
+const getAllProperties = async (
+  filters: PropertyFilters,
+  pagination: PaginationOptions,
+) => {
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationCalculate(pagination);
+  const { searchTerm, minPrice, maxPrice, ...filterData } = filters;
+  // Don't show deleted properties
+  const andConditions: Prisma.PropertyWhereInput[] = [
+    {
+      isDeleted: false,
+    },
+  ];
+
+  // Search term filter
+  if (searchTerm) {
+    andConditions.push({
+      OR: propertySearchableFields.map((field) => ({
+        [field]: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+
+  // Exact match filters
+  if (Object.keys(filterData).length) {
+    Object.entries(filterData).forEach(([field, value]) => {
+      if (!value) return;
+      if (field === "category") {
+        andConditions.push({
+          category: {
+            name: String(value),
+          },
+        });
+      } else {
+        andConditions.push({
+          [field]: value,
+        });
+      }
+    });
+  }
+
+  // Price range filter
+  if (minPrice !== undefined || maxPrice !== undefined) {
+    andConditions.push({
+      rentPrice: {
+        ...(minPrice && { gte: Number(minPrice) }),
+        ...(maxPrice && { lte: Number(maxPrice) }),
+      },
+    });
+  }
+const whereCondition: Prisma.PropertyWhereInput = andConditions.length?{AND: andConditions}:{};
+const properties = await prisma.property.findMany({
+    where: whereCondition,
+    skip,
+    take: limit,
+    orderBy: sortBy?{
+        [sortBy]: sortOrder || "asc"
+    }:{
+        createdAt: "desc"
+    },
+    include:{
+        category: true,
+        landlord: {
+            select: {
+                name: true,
+                email: true,
             }
         },
-        });
-        return property;
-})
+        images: true,
+    }
+})  
+
+// Count total properties for pagination
+const total = await prisma.property.count({
+    where: whereCondition,
+});
+
+return {
+    meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+    },
+    data: properties,
 }
+
+};
 
 
 
 export const propertyService = {
-    createProperty
-}
+  createProperty,
+    getAllProperties,
+};

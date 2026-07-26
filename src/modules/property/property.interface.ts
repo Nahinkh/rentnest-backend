@@ -1,3 +1,4 @@
+import { PaginationOptions } from "../../interfaces/pagination";
 import { ICategory } from "../category/category.interface";
 
 export interface IProperty {
@@ -19,4 +20,19 @@ export interface IProperty {
   longitude?: number;
 
   category: ICategory
+}
+
+export interface PropertyFilters {
+  searchTerm?: string;
+  city?: string;
+  division?: string;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+}
+
+export interface GetAllPropertyOptions {
+  filters: PropertyFilters;
+
+  pagination: PaginationOptions;
 }

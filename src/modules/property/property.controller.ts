@@ -3,6 +3,9 @@ import catchAsync from "../../utils/catchAsync";
 import { propertyService } from "./property.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import { queryBuilder } from "../../utils/queryBuilder";
+import { propertyFilterableFields, propertySearchableFields } from "./property.constant";
+import { paginationFields } from "../../constants/pagination";
 
 const createProperty = catchAsync(async (req:Request, res:Response) => {
     const userId = req.user?.id;
@@ -16,6 +19,19 @@ const createProperty = catchAsync(async (req:Request, res:Response) => {
     });
 })
 
+const getAllProperties = catchAsync(async (req:Request, res:Response) => {
+    const filters = queryBuilder(req.query,propertyFilterableFields)
+    const paginationOptions = queryBuilder(req.query,paginationFields)
+    const result = await propertyService.getAllProperties(filters, paginationOptions);
+    sendResponse(res,{
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Properties retrieved successfully",
+        data: result.data
+    });
+})
+
 export const propertyController = {
-    createProperty
+    createProperty,
+    getAllProperties
 }
