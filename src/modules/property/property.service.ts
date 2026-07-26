@@ -3,9 +3,10 @@ import { prisma } from "../../db";
 import { PaginationOptions } from "../../interfaces/pagination";
 import AppError from "../../utils/AppError";
 import { paginationCalculate } from "../../utils/pagination";
+import { JwtPayload } from "../auth/auth.interface";
 import { categoryService } from "../category/category.service";
 import { propertySearchableFields } from "./property.constant";
-import { IProperty, PropertyFilters } from "./property.interface";
+import { IProperty, IUpdateProperty, PropertyFilters } from "./property.interface";
 import httpStatus from "http-status";
 
 const createProperty = async (userId: string, propertyData: IProperty) => {
@@ -192,8 +193,67 @@ const getPropertyById = async (propertyId: string) => {
   return property;
 };
 
+const updateProperty = async (
+  propertyId: string,
+  propertyData: IUpdateProperty,
+  user: JwtPayload,
+) => {
+  const property = await prisma.property.findUnique({
+    where: {
+      id: propertyId,
+      isDeleted: false,
+    },
+  });
+  if (!property) {
+    throw new AppError("Property not found", httpStatus.NOT_FOUND);
+  }
+  if (user.role !== "ADMIN" && property.landlordId !== user.id) {
+    throw new AppError(
+      "You are not authorized to update this property",
+      httpStatus.FORBIDDEN,
+    );
+  }
+  const updatedProperty = await prisma.$transaction(async (tx) => {
+    const { category, ...dataWithoutCategory } = propertyData;
+    const updateData: Prisma.PropertyUpdateInput = {
+      ...dataWithoutCategory,
+    };
+    if (category) {
+      const categoryResult = await categoryService.createCategory(
+        tx,
+        category,
+      );
+      updateData.category = {
+        connect: {
+          id: categoryResult.id,
+        },
+      };
+    }
+    const updatedProperty = await tx.property.update({
+      where: {
+        id: propertyId,
+      },
+      data: updateData,
+      include: {
+        category: true,
+        landlord: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+        images: true,
+      },
+    });
+
+    return updatedProperty;
+  });
+    return updatedProperty;
+};
+
 export const propertyService = {
   createProperty,
   getAllProperties,
-    getPropertyById,
+  getPropertyById,
+  updateProperty,
 };
