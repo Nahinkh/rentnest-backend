@@ -1,3 +1,5 @@
+import { ICategory } from "../category/category.interface";
+
 export interface IProperty {
     title: string;
   description: string;
@@ -16,8 +18,5 @@ export interface IProperty {
   latitude?: number;
   longitude?: number;
 
-  category: {
-    name: string;
-    description?: string;
-  };
+  category: ICategory
 }

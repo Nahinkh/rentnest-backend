@@ -34,7 +34,7 @@ const auth = (...requiredRoles: Role[]) =>
       throw new AppError("User is blocked", httpStatus.FORBIDDEN);
     }
     if (requiredRoles.length && !requiredRoles.includes(user.role)) {
-        throw new AppError("You are not allowed to access this route", httpStatus.FORBIDDEN);
+        throw new AppError(`You are not allowed to access this route only for ${requiredRoles.join(", ")}`, httpStatus.FORBIDDEN);
     }
     req.user = {
         id: user.id,
