@@ -1,19 +1,23 @@
 export interface IProperty {
-  title: string;
+    title: string;
   description: string;
 
-  price: number;
+  rentPrice: number;
 
   bedrooms: number;
   bathrooms: number;
+
+  area?: number;
+
   address: string;
   city: string;
-  area?: string;
+  division: string;
 
   latitude?: number;
   longitude?: number;
 
-  amenities?: string[];
-
-  thumbnail?: string;
+  category: {
+    name: string;
+    description?: string;
+  };
 }
