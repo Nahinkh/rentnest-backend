@@ -1,10 +1,12 @@
 import { Prisma } from "../../../generated/prisma/client";
 import { prisma } from "../../db";
 import { PaginationOptions } from "../../interfaces/pagination";
+import AppError from "../../utils/AppError";
 import { paginationCalculate } from "../../utils/pagination";
 import { categoryService } from "../category/category.service";
 import { propertySearchableFields } from "./property.constant";
 import { IProperty, PropertyFilters } from "./property.interface";
+import httpStatus from "http-status";
 
 const createProperty = async (userId: string, propertyData: IProperty) => {
   return await prisma.$transaction(async (tx) => {
@@ -115,48 +117,83 @@ const getAllProperties = async (
       },
     });
   }
-const whereCondition: Prisma.PropertyWhereInput = andConditions.length?{AND: andConditions}:{};
-const properties = await prisma.property.findMany({
+  const whereCondition: Prisma.PropertyWhereInput = andConditions.length
+    ? { AND: andConditions }
+    : {};
+  const properties = await prisma.property.findMany({
     where: whereCondition,
     skip,
     take: limit,
-    orderBy: sortBy?{
-        [sortBy]: sortOrder || "asc"
-    }:{
-        createdAt: "desc"
-    },
-    include:{
-        category: true,
-        landlord: {
-            select: {
-                name: true,
-                email: true,
-            }
+    orderBy: sortBy
+      ? {
+          [sortBy]: sortOrder || "asc",
+        }
+      : {
+          createdAt: "desc",
         },
-        images: true,
-    }
-})  
+    include: {
+      category: true,
+      landlord: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+      images: true,
+    },
+  });
 
-// Count total properties for pagination
-const total = await prisma.property.count({
+  // Count total properties for pagination
+  const total = await prisma.property.count({
     where: whereCondition,
-});
+  });
 
-return {
+  return {
     meta: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
     },
     data: properties,
-}
-
+  };
 };
 
-
+const getPropertyById = async (propertyId: string) => {
+  const property = await prisma.property.findUnique({
+    where: {
+      id: propertyId,
+      isDeleted: false,
+    },
+    include: {
+      category: true,
+      landlord: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+      images: true,
+      reviews: {
+        include: {
+          tenant: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
+      },
+    },
+  });
+  if (!property) {
+    throw new AppError("Property not found", httpStatus.NOT_FOUND);
+  }
+  return property;
+};
 
 export const propertyService = {
   createProperty,
-    getAllProperties,
+  getAllProperties,
+    getPropertyById,
 };
