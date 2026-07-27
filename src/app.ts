@@ -8,6 +8,7 @@ import notFound from "./middleware/notFound";
 import globalErrorHandler from "./middleware/globalErrorHandler";
 import 'dotenv/config'
 import { propertyRoute } from "./modules/property/property.route";
+import { tenantRoute } from "./modules/tenant/tenant.route";
 
 app.use(cors({
     origin: envConfig.app_url,
@@ -19,6 +20,8 @@ app.use(cookieParser());
 
 app.use("/api/auth",authRoutes);
 app.use("/api/landlord/properties", propertyRoute);
+
+app.use("/api/rentals",tenantRoute);
 
 app.use(globalErrorHandler);
 app.use(notFound);

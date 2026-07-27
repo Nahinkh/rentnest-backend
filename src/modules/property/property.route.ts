@@ -9,5 +9,6 @@ route.post("/",auth(Role.LANDLORD), propertyController.createProperty);
 route.get("/",auth(), propertyController.getAllProperties);
 route.get("/:id",auth(), propertyController.getPropertyById);
 route.patch("/:id",auth(Role.LANDLORD), propertyController.updateProperty);
+route.delete("/:id",auth(Role.LANDLORD), propertyController.deleteProperty);
 
 export const propertyRoute = route;

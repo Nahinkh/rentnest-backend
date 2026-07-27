@@ -251,9 +251,37 @@ const updateProperty = async (
     return updatedProperty;
 };
 
+const deleteProperty = async (propertyId: string, user: JwtPayload) => {
+    const property = await prisma.property.findUnique({
+        where: {
+            id: propertyId,
+            isDeleted: false,
+        }
+
+    })
+
+    if (!property) {
+        throw new AppError("Property not found", httpStatus.NOT_FOUND);
+    }
+
+    if (user.role !== "ADMIN" && property.landlordId !== user.id) {
+        throw new AppError("You are not authorized to delete this property", httpStatus.FORBIDDEN);
+    }
+
+    const deletedProperty = await prisma.property.update({
+        where: {
+            id: propertyId,
+        },
+        data: {
+            isDeleted: true,
+        },
+    })
+}
+
 export const propertyService = {
   createProperty,
   getAllProperties,
   getPropertyById,
   updateProperty,
+  deleteProperty
 };
