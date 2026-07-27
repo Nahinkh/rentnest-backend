@@ -9,6 +9,8 @@ route.post("/",auth(), tenantController.createRentalRequest);
 route.get("/",auth(), tenantController.getRentalRequestsByTenant);
 route.get("/property-request",auth(Role.LANDLORD), tenantController.getPropertyRequest);
 route.patch("/:id/approve",auth(Role.LANDLORD), tenantController.approveRentalRequest);
+route.patch("/:id/reject",auth(Role.LANDLORD), tenantController.rejectRentalRequest);
+route.patch("/:id/cancel",auth(Role.TENANT), tenantController.cancelRentalRequest);
 
 
 export const tenantRoute = route;

@@ -1,4 +1,3 @@
-
 import { ICreateRental } from "./tenant.interface";
 import { prisma } from "../../db";
 import AppError from "../../utils/AppError";
@@ -235,18 +234,145 @@ const approveRentalRequest = async (requestId: string, user: JwtPayload) => {
                 email: true,
               },
             },
-            images:true
+            images: true,
           },
         },
       },
     });
   });
-  return result
+  return result;
+};
+
+const rejectRentalRequest = async (requestId: string, user: JwtPayload) => {
+  const rentalRequest = await prisma.rentalRequest.findUnique({
+    where: {
+      id: requestId,
+    },
+    include: {
+      property: true,
+    },
+  });
+
+  if (!rentalRequest) {
+    throw new AppError("Rental request not found.", httpStatus.NOT_FOUND);
+  }
+
+  if (rentalRequest.property.isDeleted) {
+    throw new AppError("Property not found.", httpStatus.NOT_FOUND);
+  }
+
+  if (rentalRequest.property.landlordId !== user.id) {
+    throw new AppError(
+      "You are not authorized to reject this rental request.",
+      httpStatus.FORBIDDEN,
+    );
+  }
+
+  if (rentalRequest.status !== RentalRequestStatus.PENDING) {
+    throw new AppError(
+      "This rental request has already been processed.",
+      httpStatus.BAD_REQUEST,
+    );
+  }
+
+  const result = await prisma.rentalRequest.update({
+    where: {
+      id: requestId,
+    },
+    data: {
+      status: RentalRequestStatus.REJECTED,
+    },
+    include: {
+      tenant: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      property: {
+        include: {
+          category: true,
+          landlord: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          images: true,
+        },
+      },
+    },
+  });
+  return result;
+};
+
+const cancelRentalRequest = async (requestId: string, user: JwtPayload) => {
+  const rentalRequest = await prisma.rentalRequest.findUnique({
+    where: {
+      id: requestId,
+    },
+    include: {
+      property: true,
+    },
+  });
+
+  if (!rentalRequest) {
+    throw new AppError("Rental request not found.", httpStatus.NOT_FOUND);
+  }
+  if (rentalRequest.tenantId !== user.id) {
+    throw new AppError(
+      "You are not authorized to cancel this rental request.",
+      httpStatus.FORBIDDEN,
+    );
+  }
+
+  if (rentalRequest.status !== RentalRequestStatus.PENDING) {
+    throw new AppError(
+      "Only pending rental requests can be cancelled.",
+      httpStatus.BAD_REQUEST,
+    );
+  }
+  const result = await prisma.rentalRequest.update({
+    where: {
+      id: requestId,
+    },
+    data: {
+      status: RentalRequestStatus.CANCELLED,
+    },
+    include: {
+      tenant: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      property: {
+        include: {
+          category: true,
+          landlord: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          images: true,
+        },
+      },
+    },
+  });
+
+  return result;
 };
 
 export const tenantService = {
   createRentalRequest,
   getRentalRequestsByTenant,
   getPropertyRequest,
-  approveRentalRequest
+  approveRentalRequest,
+  rejectRentalRequest,
+  cancelRentalRequest,
 };

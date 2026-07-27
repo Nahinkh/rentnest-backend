@@ -53,11 +53,35 @@ const approveRentalRequest = catchAsync(async(req:Request,res:Response)=>{
     });
 
 })
+const rejectRentalRequest  = catchAsync(async(req:Request,res:Response)=>{
+    const user = req.user as JwtPayload
+    const result = await tenantService.rejectRentalRequest(req.params.id as string,user)
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Rental request rejected successfully",
+        data: result
+    });
+
+})
+const cancelRentalRequest  = catchAsync(async(req:Request,res:Response)=>{
+    const user = req.user
+    const result = await tenantService.cancelRentalRequest(req.params.id as string,user)
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Rental request cancel successfully",
+        data: result
+    });
+
+})
 
 
 export const tenantController = {
   createRentalRequest,
   getRentalRequestsByTenant,
   getPropertyRequest,
-  approveRentalRequest
+  approveRentalRequest,
+  rejectRentalRequest,
+  cancelRentalRequest
 };
