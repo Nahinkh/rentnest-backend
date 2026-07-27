@@ -9,6 +9,7 @@ import globalErrorHandler from "./middleware/globalErrorHandler";
 import 'dotenv/config'
 import { propertyRoute } from "./modules/property/property.route";
 import { tenantRoute } from "./modules/tenant/tenant.route";
+import stripe from "./config/stripe";
 
 app.use(cors({
     origin: envConfig.app_url,
@@ -22,6 +23,12 @@ app.use("/api/auth",authRoutes);
 app.use("/api/landlord/properties", propertyRoute);
 
 app.use("/api/rentals",tenantRoute);
+
+// Check Stripe is connected
+// const paymentMethods = await stripe.paymentMethods.list({
+//   customer: "cus_test",
+// }); 
+// console.log("Stripe configured successfully");
 
 app.use(globalErrorHandler);
 app.use(notFound);

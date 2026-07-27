@@ -4,7 +4,7 @@ model Payment {
   rentalRequestId String          @unique
   tenantId        String
 
-  transactionId   String          @unique
+  transactionId   String?          @unique
 
   amount          Decimal         @db.Decimal(10, 2)
 
@@ -15,7 +15,9 @@ model Payment {
 
   paidAt          DateTime?
 
+
   createdAt       DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 
   rentalRequest   RentalRequest   @relation(fields: [rentalRequestId], references: [id], onDelete: Cascade)
 
