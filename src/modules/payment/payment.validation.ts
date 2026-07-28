@@ -1,4 +1,4 @@
-import { RentalRequestStatus } from "../../../generated/prisma/enums";
+import { PaymentStatus, PropertyStatus, RentalRequestStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../db";
 import AppError from "../../utils/AppError";
 import { JwtPayload } from "../auth/auth.interface";
@@ -7,13 +7,12 @@ import httpStatus from "http-status";
 
 export const validatePaymentRequest = async (
   payload: ICreatePaymentIntent,
-  user: JwtPayload
+  user: JwtPayload,
 ) => {
-
   if (!payload.rentalRequestId) {
     throw new AppError(
-        "Rental request id is required.",
-        httpStatus.BAD_REQUEST,
+      "Rental request id is required.",
+      httpStatus.BAD_REQUEST,
     );
   }
 
@@ -28,32 +27,36 @@ export const validatePaymentRequest = async (
   });
 
   if (!rentalRequest) {
+    throw new AppError("Rental request not found",httpStatus.NOT_FOUND,);
+  }
+
+  if (rentalRequest.status !== RentalRequestStatus.APPROVED) {
     throw new AppError(
-        "Rental request not found.",
-        httpStatus.NOT_FOUND,
+      "Rental request is not approved",
+      httpStatus.BAD_REQUEST,
     );
   }
 
-  if (rentalRequest.tenantId !== user.id) {
+  if (rentalRequest.property.availability === PropertyStatus.RENTED) {
     throw new AppError(
-        "You are not authorized.",
-        httpStatus.FORBIDDEN,
+      "Property has already been rented",
+      httpStatus.BAD_REQUEST,
+    );
+  }
+  if (rentalRequest.property.availability === PropertyStatus.UNAVAILABLE) {
+    throw new AppError(
+      "Property has already been UNAVAILABLE",
+      httpStatus.BAD_REQUEST,
     );
   }
 
   if (
-    rentalRequest.status !== RentalRequestStatus.APPROVED
+    rentalRequest.payment &&
+    rentalRequest.payment.status === PaymentStatus.SUCCESS
   ) {
     throw new AppError(
-        "Rental request has not been approved.",
-        httpStatus.BAD_REQUEST,
-    );
-  }
-
-  if (rentalRequest.payment) {
-    throw new AppError(
-        "Payment already exists.",
-        httpStatus.BAD_REQUEST,
+      "Payment has already been completed",
+      httpStatus.BAD_REQUEST,
     );
   }
 
@@ -63,6 +66,4 @@ export const validatePaymentRequest = async (
     rentalRequest,
     amount,
   };
-
 };
-

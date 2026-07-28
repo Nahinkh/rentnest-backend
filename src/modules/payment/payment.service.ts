@@ -1,13 +1,12 @@
 import { ICreatePaymentIntent } from "./payment.interface";
-import AppError from "../../utils/AppError";
-import httpStatus from "http-status";
+
 import { prisma } from "../../db";
 import { JwtPayload } from "../auth/auth.interface";
 import {
+  PaymentMethod,
   PaymentProvider,
   PaymentStatus,
   PropertyStatus,
-  RentalRequestStatus,
 } from "../../../generated/prisma/enums";
 import {
   createStripeCheckoutSession,
@@ -18,6 +17,8 @@ import stripe from "../../config/stripe";
 import envConfig from "../../config/envConfig";
 import { Request } from "express";
 import Stripe from "stripe";
+import AppError from "../../utils/AppError";
+import httpStatus from "http-status";
 
 const createPaymentIntent = async (
   payload: ICreatePaymentIntent,
@@ -99,13 +100,12 @@ const stripeWebhook = async (req: Request) => {
   const event = stripe.webhooks.constructEvent(
     req.body,
     signature,
-    envConfig.stripe_webhook_secret
+    envConfig.stripe_webhook_secret,
   );
 
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
-
       const payment = await prisma.payment.findUnique({
         where: {
           transactionId: session.id,
@@ -128,32 +128,55 @@ const stripeWebhook = async (req: Request) => {
         };
       }
 
-      await prisma.$transaction([
-        prisma.payment.update({
-          where: {
-            id: payment.id,
-          },
-          data: {
-            status: PaymentStatus.SUCCESS,
-            paidAt: new Date(),
-          },
-        }),
+      // Retrieve PaymentIntent
+      const paymentIntent = await stripe.paymentIntents.retrieve(
+        session.payment_intent as string,
+      );
 
-        prisma.property.update({
-          where: {
-            id: payment.rentalRequest.propertyId,
-          },
-          data: {
-            availability: PropertyStatus.RENTED,
-          },
-        }),
-      ]);
+      // Retrieve Payment Method
+      const stripePaymentMethod = await stripe.paymentMethods.retrieve(
+        paymentIntent.payment_method as string,
+      );
+      let paymentMethod: PaymentMethod;
+      switch (stripePaymentMethod.type) {
+        case "card":
+          paymentMethod = PaymentMethod.CARD;
+          break;
+
+        default:
+          paymentMethod = PaymentMethod.CARD;
+          break;
+      }
+      try {
+        await prisma.$transaction([
+          prisma.payment.update({
+            where: {
+              id: payment.id,
+            },
+            data: {
+              status: PaymentStatus.SUCCESS,
+              paymentMethod,
+              paidAt: new Date(),
+            },
+          }),
+
+          prisma.property.update({
+            where: {
+              id: payment.rentalRequest.propertyId,
+            },
+            data: {
+              availability: PropertyStatus.RENTED,
+            },
+          }),
+        ]);
+      } catch (error) {
+        throw new AppError("Transaction failed", httpStatus.FORBIDDEN);
+      }
 
       break;
     }
 
     default:
-      console.log(`Unhandled event: ${event.type}`);
   }
 
   return {
@@ -164,5 +187,5 @@ const stripeWebhook = async (req: Request) => {
 export const paymentService = {
   createPaymentIntent,
   createCheckoutSession,
-  stripeWebhook
+  stripeWebhook,
 };
