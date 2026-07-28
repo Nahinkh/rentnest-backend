@@ -1,23 +1,24 @@
 model Review {
-  id          String   @id @default(uuid())
+  id               String   @id @default(uuid())
 
-  tenantId    String
-  propertyId  String
+  tenantId         String
+  propertyId       String
+  rentalRequestId  String   @unique
 
-  rating      Int
+  rating           Int
+  comment          String?  @db.Text
 
-  comment     String?  @db.Text
+  status           ReviewStatus @default(VISIBLE)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  tenant       User     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  property     Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  tenant           User            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property         Property        @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  rentalRequest    RentalRequest   @relation(fields: [rentalRequestId], references: [id], onDelete: Cascade)
 
-  @@unique([tenantId, propertyId])
-
-  @@index([propertyId])
   @@index([tenantId])
+  @@index([propertyId])
 
   @@map("reviews")
 }

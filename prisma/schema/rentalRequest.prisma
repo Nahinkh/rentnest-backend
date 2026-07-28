@@ -9,6 +9,7 @@ model RentalRequest {
     startDate DateTime
 
     durationMonth Int
+     review        Review?
 
     status RentalRequestStatus @default(PENDING)
 

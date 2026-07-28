@@ -10,6 +10,7 @@ import 'dotenv/config'
 import { propertyRoute } from "./modules/property/property.route";
 import { tenantRoute } from "./modules/tenant/tenant.route";
 import { paymentRoute } from "./modules/payment/payment.route";
+import { reviewRoute } from "./modules/review/review.route";
 
 app.use(cors({
     origin: envConfig.app_url,
@@ -29,6 +30,8 @@ app.use("/api/landlord/properties", propertyRoute);
 
 app.use("/api/rentals",tenantRoute);
 app.use("/api/payments",paymentRoute);
+app.use("/api/reviews",reviewRoute);
+
 
 
 // Check Stripe is connected

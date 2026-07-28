@@ -39,3 +39,7 @@ enum PaymentMethod {
   BANK_TRANSFER
   CASH
 }
+enum ReviewStatus {
+  VISIBLE
+  HIDDEN
+}

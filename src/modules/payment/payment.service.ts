@@ -137,6 +137,8 @@ const stripeWebhook = async (req: Request) => {
       const stripePaymentMethod = await stripe.paymentMethods.retrieve(
         paymentIntent.payment_method as string,
       );
+      console.log(paymentIntent);
+
       let paymentMethod: PaymentMethod;
       switch (stripePaymentMethod.type) {
         case "card":
@@ -147,7 +149,9 @@ const stripeWebhook = async (req: Request) => {
           paymentMethod = PaymentMethod.CARD;
           break;
       }
+      console.log("Payment Method:", paymentIntent.payment_method);
       try {
+        console.log("Updating payment...");
         await prisma.$transaction([
           prisma.payment.update({
             where: {
@@ -169,8 +173,10 @@ const stripeWebhook = async (req: Request) => {
             },
           }),
         ]);
+        console.log("Payment updated successfully");
       } catch (error) {
-        throw new AppError("Transaction failed", httpStatus.FORBIDDEN);
+        console.error(error);
+        throw error;
       }
 
       break;
