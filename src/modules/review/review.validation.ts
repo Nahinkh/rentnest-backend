@@ -81,10 +81,7 @@ export const validateUpdateReview = async (
   });
 
   if (!review) {
-    throw new AppError(
-      "Review not found.",
-      httpStatus.NOT_FOUND,
-    );
+    throw new AppError("Review not found.", httpStatus.NOT_FOUND);
   }
 
   if (review.tenantId !== tenantId) {
@@ -101,6 +98,30 @@ export const validateUpdateReview = async (
     throw new AppError(
       "Rating must be between 1 and 5.",
       httpStatus.BAD_REQUEST,
+    );
+  }
+
+  return review;
+};
+
+export const validateDeleteReview = async (
+  tenantId: string,
+  reviewId: string,
+) => {
+  const review = await prisma.review.findUnique({
+    where: {
+      id: reviewId,
+    },
+  });
+
+  if (!review) {
+    throw new AppError("Review not found.",httpStatus.NOT_FOUND,);
+  }
+
+  if (review.tenantId !== tenantId) {
+    throw new AppError(
+      "You are not allowed to access this review.",
+      httpStatus.FORBIDDEN,
     );
   }
 

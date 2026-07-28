@@ -1,7 +1,7 @@
 import { ReviewStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../db";
 import { ICreateReview } from "./review.interface";
-import { validateCreateReview, validateUpdateReview } from "./review.validation";
+import { validateCreateReview, validateDeleteReview, validateUpdateReview } from "./review.validation";
 
 const createReview = async (tenantId: string, payload: ICreateReview) => {
   const rentalRequest = await validateCreateReview(
@@ -133,9 +133,28 @@ const updateReview = async (
   });
 };
 
+const deleteReview = async (
+  tenantId: string,
+  reviewId: string,
+) => {
+  await validateDeleteReview(
+    tenantId,
+    reviewId,
+  );
+
+  await prisma.review.delete({
+    where: {
+      id: reviewId,
+    },
+  });
+
+  return null;
+};
+
 export const reviewService = {
   createReview,
   getPropertyReview,
   getMyReviews,
-  updateReview
+  updateReview,
+  deleteReview
 };

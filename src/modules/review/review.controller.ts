@@ -47,6 +47,7 @@ const getMyReviews = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 const updateReview = catchAsync(async (req, res) => {
   const { id: tenantId } = req.user;
 
@@ -64,9 +65,28 @@ const updateReview = catchAsync(async (req, res) => {
   });
 });
 
+const deleteReview = catchAsync(async (req, res) => {
+  const { id: tenantId } = req.user;
+
+  await reviewService.deleteReview(
+    tenantId,
+    req.params.reviewId as string,
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Review deleted successfully.",
+    data: null,
+  });
+});
+
+
+
 export const reviewController = {
   createReview,
   getPropertyReviews,
   getMyReviews,
-  updateReview
+  updateReview,
+  deleteReview
 };
