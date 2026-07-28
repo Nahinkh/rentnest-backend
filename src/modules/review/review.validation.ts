@@ -6,6 +6,7 @@ import {
 import { prisma } from "../../db";
 import AppError from "../../utils/AppError";
 import httpStatus from "http-status";
+import { ICreateReview } from "./review.interface";
 
 export const validateCreateReview = async (
   tenantId: string,
@@ -67,4 +68,41 @@ export const validateCreateReview = async (
   }
 
   return rentalRequest;
+};
+export const validateUpdateReview = async (
+  tenantId: string,
+  reviewId: string,
+  payload: Partial<ICreateReview>,
+) => {
+  const review = await prisma.review.findUnique({
+    where: {
+      id: reviewId,
+    },
+  });
+
+  if (!review) {
+    throw new AppError(
+      "Review not found.",
+      httpStatus.NOT_FOUND,
+    );
+  }
+
+  if (review.tenantId !== tenantId) {
+    throw new AppError(
+      "You are not allowed to update this review.",
+      httpStatus.FORBIDDEN,
+    );
+  }
+
+  if (
+    payload.rating !== undefined &&
+    (payload.rating < 1 || payload.rating > 5)
+  ) {
+    throw new AppError(
+      "Rating must be between 1 and 5.",
+      httpStatus.BAD_REQUEST,
+    );
+  }
+
+  return review;
 };
