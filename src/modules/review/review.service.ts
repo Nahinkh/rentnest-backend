@@ -1,7 +1,14 @@
+import { Prisma } from "../../../generated/prisma/browser";
 import { ReviewStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../db";
+import { PaginationOptions } from "../../interfaces/pagination";
+import { paginationCalculate } from "../../utils/pagination";
 import { ICreateReview } from "./review.interface";
-import { validateCreateReview, validateDeleteReview, validateUpdateReview } from "./review.validation";
+import {
+  validateCreateReview,
+  validateDeleteReview,
+  validateUpdateReview,
+} from "./review.validation";
 
 const createReview = async (tenantId: string, payload: ICreateReview) => {
   const rentalRequest = await validateCreateReview(
@@ -80,7 +87,7 @@ const getMyReviews = async (
             id: true,
             title: true,
             address: true,
-            rentPrice:true,
+            rentPrice: true,
             images: true,
             availability: true,
           },
@@ -116,11 +123,7 @@ const updateReview = async (
   reviewId: string,
   payload: Partial<ICreateReview>,
 ) => {
-  await validateUpdateReview(
-    tenantId,
-    reviewId,
-    payload,
-  );
+  await validateUpdateReview(tenantId, reviewId, payload);
 
   return prisma.review.update({
     where: {
@@ -133,14 +136,8 @@ const updateReview = async (
   });
 };
 
-const deleteReview = async (
-  tenantId: string,
-  reviewId: string,
-) => {
-  await validateDeleteReview(
-    tenantId,
-    reviewId,
-  );
+const deleteReview = async (tenantId: string, reviewId: string) => {
+  await validateDeleteReview(tenantId, reviewId);
 
   await prisma.review.delete({
     where: {
@@ -151,10 +148,61 @@ const deleteReview = async (
   return null;
 };
 
+const getLandlordPropertyReviews = async (
+  landlordId: string,
+  options: PaginationOptions,
+) => {
+  const { page, limit, skip, sortBy, sortOrder } = paginationCalculate(options);
+
+  // Find all reviews where the property belongs to a specific landlord
+  const whereCondition: Prisma.ReviewWhereInput = {
+    property: {
+      landlordId,
+    },
+  };
+
+  const [reviews, total] = await prisma.$transaction([
+    prisma.review.findMany({
+      where: whereCondition,
+      include: {
+        tenant: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+          },
+        },
+        property: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+      },
+      orderBy: sortBy ? { [sortBy]: sortOrder } : { createdAt: "desc" },
+      skip,
+      take:limit
+    }),
+    prisma.review.count({
+      where:whereCondition
+    })
+  ]);
+  return{
+    meta:{
+      page,
+      limit,
+      total,
+      totalPage:Math.ceil(total/limit)
+    },
+    data:reviews
+  }
+};
+
 export const reviewService = {
   createReview,
   getPropertyReview,
   getMyReviews,
   updateReview,
-  deleteReview
+  deleteReview,
+  getLandlordPropertyReviews
 };

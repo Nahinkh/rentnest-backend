@@ -81,6 +81,19 @@ const deleteReview = catchAsync(async (req, res) => {
   });
 });
 
+// Get Landlord property Reviews
+const getLandlordPropertyPreviews = catchAsync(async(req:Request,res:Response)=>{
+  const {id:landlordId} =req.user;
+  const result = await reviewService.getLandlordPropertyReviews(landlordId,req.query);
+   sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Property reviews retrieved successfully.",
+    data: result,
+  });
+})
+
+
 
 
 export const reviewController = {
@@ -88,5 +101,6 @@ export const reviewController = {
   getPropertyReviews,
   getMyReviews,
   updateReview,
-  deleteReview
+  deleteReview,
+  getLandlordPropertyPreviews
 };
