@@ -137,7 +137,6 @@ const stripeWebhook = async (req: Request) => {
       const stripePaymentMethod = await stripe.paymentMethods.retrieve(
         paymentIntent.payment_method as string,
       );
-      console.log(paymentIntent);
 
       let paymentMethod: PaymentMethod;
       switch (stripePaymentMethod.type) {
@@ -149,7 +148,6 @@ const stripeWebhook = async (req: Request) => {
           paymentMethod = PaymentMethod.CARD;
           break;
       }
-      console.log("Payment Method:", paymentIntent.payment_method);
       try {
         console.log("Updating payment...");
         await prisma.$transaction([
