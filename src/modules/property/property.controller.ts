@@ -22,7 +22,8 @@ const createProperty = catchAsync(async (req:Request, res:Response) => {
 const getAllProperties = catchAsync(async (req:Request, res:Response) => {
     const filters = queryBuilder(req.query,propertyFilterableFields)
     const paginationOptions = queryBuilder(req.query,paginationFields)
-    const result = await propertyService.getAllProperties(filters, paginationOptions);
+    const isAdmin = req.user?.role === "ADMIN";
+    const result = await propertyService.getAllProperties(filters, paginationOptions, isAdmin);
     sendResponse(res,{
         success: true,
         statusCode: httpStatus.OK,

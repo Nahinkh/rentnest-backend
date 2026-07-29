@@ -1,4 +1,4 @@
-import { Prisma } from "../../../generated/prisma/client";
+import { Prisma, PropertyStatus } from "../../../generated/prisma/client";
 import { prisma } from "../../db";
 import { PaginationOptions } from "../../interfaces/pagination";
 import AppError from "../../utils/AppError";
@@ -68,6 +68,7 @@ const createProperty = async (userId: string, propertyData: IProperty) => {
 const getAllProperties = async (
   filters: PropertyFilters,
   pagination: PaginationOptions,
+  isAdmin?: boolean
 ) => {
   const { page, limit, skip, sortBy, sortOrder } =
     paginationCalculate(pagination);
@@ -78,6 +79,7 @@ const getAllProperties = async (
       isDeleted: false,
     },
   ];
+
 
   // Search term filter
   if (searchTerm) {
@@ -121,6 +123,11 @@ const getAllProperties = async (
   const whereCondition: Prisma.PropertyWhereInput = andConditions.length
     ? { AND: andConditions }
     : {};
+
+    if (!isAdmin) {
+    whereCondition.availability = PropertyStatus.AVAILABLE;
+  }
+
   const properties = await prisma.property.findMany({
     where: whereCondition,
     skip,

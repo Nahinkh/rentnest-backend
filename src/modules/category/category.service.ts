@@ -1,26 +1,49 @@
 import { Prisma } from "../../../generated/prisma/client";
+import { prisma } from "../../db";
+import { createCategoryHelper } from "./category.helper";
 import { ICategory } from "./category.interface";
 
-const createCategory = async (tx:Prisma.TransactionClient,categoryData: ICategory) => {
-    const existingCategory = await tx.category.findUnique({
+const createCategory = async (categoryData: ICategory) => {
+  return await prisma.$transaction(async (tx) => {
+    return await createCategoryHelper(tx, categoryData);
+  });
+};
+
+const getAllCategories = async () => {
+    return await prisma.category.findMany({
+        select: {
+            id: true,
+            name: true,
+            slug: true,
+            description: true,
+        }
+    })
+}
+
+const updateCategory = async (categoryId: string, categoryData: ICategory) => {
+    return await prisma.category.update({
         where: {
-            name: categoryData.name,
+            id: categoryId,
         },
-    });
-    if (existingCategory) {
-        return existingCategory;
-    }
-    const slug = categoryData.name.toLowerCase().replace(/\s+/g, '-');
-    const category = await tx.category.create({
         data: {
             name: categoryData.name,
-            slug: slug,
+            slug: categoryData.name.toLowerCase().replace(/\s+/g, "-"),
             description: categoryData.description || null,
         },
     });
-    return category;
+}
+
+const deleteCategory = async (categoryId: string) => {
+    return await prisma.category.delete({
+        where: {
+            id: categoryId,
+        },
+    });
 }
 
 export const categoryService = {
-    createCategory
-}
+  createCategory,
+  getAllCategories,
+  updateCategory,
+  deleteCategory,
+};
