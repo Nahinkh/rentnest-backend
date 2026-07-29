@@ -2,6 +2,7 @@ import {
   PaymentStatus,
   PropertyStatus,
   RentalRequestStatus,
+  ReviewStatus,
 } from "../../../generated/prisma/enums";
 import { prisma } from "../../db";
 import AppError from "../../utils/AppError";
@@ -127,3 +128,28 @@ export const validateDeleteReview = async (
 
   return review;
 };
+
+export const validateUpdateReviewStatus = async (reviewId: string, status: ReviewStatus) => {
+  const review = await prisma.review.findUnique({
+    where: {
+      id: reviewId,
+    },
+  });
+
+  if (!review) {
+    throw new AppError("Review not found", httpStatus.NOT_FOUND);
+  }
+  if(!Object.values(ReviewStatus).includes(status)) {
+    throw new AppError("Invalid review status", httpStatus.BAD_REQUEST);
+  }
+
+  if (review.status === status) {
+    throw new AppError(
+      `Review status is already ${status}`,
+      httpStatus.BAD_REQUEST,
+    );
+  }
+
+
+  return review;
+}

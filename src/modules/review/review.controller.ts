@@ -108,6 +108,25 @@ const getAllReviewsByAdmin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const changeReviewStatusByAdmin = catchAsync(
+  async (req: Request, res: Response) => {
+    const { reviewId } = req.params;
+    const { status } = req.body;
+
+    const result = await reviewService.changeReviewStatusByAdmin(
+      reviewId as string,
+      status,
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Review status updated successfully.",
+      data: result,
+    });
+  },
+);
+
 export const reviewController = {
   createReview,
   getPropertyReviews,
@@ -116,4 +135,5 @@ export const reviewController = {
   deleteReview,
   getLandlordPropertyPreviews,
   getAllReviewsByAdmin,
+  changeReviewStatusByAdmin,
 };

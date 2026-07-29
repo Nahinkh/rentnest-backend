@@ -20,6 +20,7 @@ route.get("/landlord",auth(Role.LANDLORD),reviewController.getLandlordPropertyPr
 
 // Admin
 route.get("/admin/reviews",auth(Role.ADMIN),reviewController.getAllReviewsByAdmin);
+route.patch("/admin/reviews/:reviewId",auth(Role.ADMIN),reviewController.changeReviewStatusByAdmin);
 
 
 

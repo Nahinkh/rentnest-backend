@@ -2,12 +2,15 @@ import { Prisma } from "../../../generated/prisma/browser";
 import { ReviewStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../db";
 import { PaginationOptions } from "../../interfaces/pagination";
+import AppError from "../../utils/AppError";
 import { paginationCalculate } from "../../utils/pagination";
 import { ICreateReview } from "./review.interface";
+import httpStatus from "http-status";
 import {
   validateCreateReview,
   validateDeleteReview,
   validateUpdateReview,
+  validateUpdateReviewStatus,
 } from "./review.validation";
 
 const createReview = async (tenantId: string, payload: ICreateReview) => {
@@ -247,6 +250,21 @@ const getAllReviewsByAdmin = async (
   };
 };
 
+const changeReviewStatusByAdmin = async (
+  reviewId: string,
+  status: ReviewStatus,
+) => {
+  const validatedReview = await validateUpdateReviewStatus(reviewId, status);
+  return prisma.review.update({
+    where: {
+      id: reviewId,
+    },
+    data: {
+      status,
+    },
+  });
+};
+
 export const reviewService = {
   createReview,
   getPropertyReview,
@@ -255,4 +273,5 @@ export const reviewService = {
   deleteReview,
   getLandlordPropertyReviews,
   getAllReviewsByAdmin,
+  changeReviewStatusByAdmin,
 };
