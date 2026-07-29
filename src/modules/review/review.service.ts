@@ -181,21 +181,70 @@ const getLandlordPropertyReviews = async (
       },
       orderBy: sortBy ? { [sortBy]: sortOrder } : { createdAt: "desc" },
       skip,
-      take:limit
+      take: limit,
     }),
     prisma.review.count({
-      where:whereCondition
-    })
+      where: whereCondition,
+    }),
   ]);
-  return{
-    meta:{
+  return {
+    meta: {
       page,
       limit,
       total,
-      totalPage:Math.ceil(total/limit)
+      totalPage: Math.ceil(total / limit),
     },
-    data:reviews
+    data: reviews,
+  };
+};
+
+const getAllReviewsByAdmin = async (
+  options: PaginationOptions,
+  filter: { status?: ReviewStatus },
+) => {
+  const { page, limit, skip, sortBy, sortOrder } = paginationCalculate(options);
+  const whereCondition: Prisma.ReviewWhereInput = {};
+  if (filter.status) {
+    whereCondition.status = filter.status;
   }
+
+  const [reviews, total] = await prisma.$transaction([
+    prisma.review.findMany({
+      where: whereCondition,
+      include: {
+        tenant: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+          },
+        },
+        property: {
+          select: {
+            id: true,
+            title: true,
+            address: true,
+          },
+        },
+      },
+      orderBy: sortBy ? { [sortBy]: sortOrder } : { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.review.count({
+      where: whereCondition,
+    }),
+  ]);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+      totalPage: Math.ceil(total / limit),
+    },
+    data: reviews,
+  };
 };
 
 export const reviewService = {
@@ -204,5 +253,6 @@ export const reviewService = {
   getMyReviews,
   updateReview,
   deleteReview,
-  getLandlordPropertyReviews
+  getLandlordPropertyReviews,
+  getAllReviewsByAdmin,
 };

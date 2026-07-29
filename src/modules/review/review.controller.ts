@@ -3,6 +3,8 @@ import catchAsync from "../../utils/catchAsync";
 import { reviewService } from "./review.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import { paginationFields } from "../../constants/pagination";
+import { queryBuilder } from "../../utils/queryBuilder";
 const createReview = catchAsync(async (req: Request, res: Response) => {
   const tenantId = req.user.id;
 
@@ -34,11 +36,7 @@ const getMyReviews = catchAsync(async (req, res) => {
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 10;
 
-  const result = await reviewService.getMyReviews(
-    tenantId,
-    page,
-    limit,
-  );
+  const result = await reviewService.getMyReviews(tenantId, page, limit);
 
   sendResponse(res, {
     success: true,
@@ -68,10 +66,7 @@ const updateReview = catchAsync(async (req, res) => {
 const deleteReview = catchAsync(async (req, res) => {
   const { id: tenantId } = req.user;
 
-  await reviewService.deleteReview(
-    tenantId,
-    req.params.reviewId as string,
-  );
+  await reviewService.deleteReview(tenantId, req.params.reviewId as string);
 
   sendResponse(res, {
     success: true,
@@ -82,19 +77,36 @@ const deleteReview = catchAsync(async (req, res) => {
 });
 
 // Get Landlord property Reviews
-const getLandlordPropertyPreviews = catchAsync(async(req:Request,res:Response)=>{
-  const {id:landlordId} =req.user;
-  const result = await reviewService.getLandlordPropertyReviews(landlordId,req.query);
-   sendResponse(res, {
+const getLandlordPropertyPreviews = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id: landlordId } = req.user;
+    const result = await reviewService.getLandlordPropertyReviews(
+      landlordId,
+      req.query,
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Property reviews retrieved successfully.",
+      data: result,
+    });
+  },
+);
+
+const getAllReviewsByAdmin = catchAsync(async (req: Request, res: Response) => {
+  const paginationOptions = queryBuilder(req.query, paginationFields);
+  const filter = queryBuilder(req.query, ["status"]);
+  const result = await reviewService.getAllReviewsByAdmin(
+    paginationOptions,
+    filter,
+  );
+  sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Property reviews retrieved successfully.",
+    message: "All reviews retrieved successfully.",
     data: result,
   });
-})
-
-
-
+});
 
 export const reviewController = {
   createReview,
@@ -102,5 +114,6 @@ export const reviewController = {
   getMyReviews,
   updateReview,
   deleteReview,
-  getLandlordPropertyPreviews
+  getLandlordPropertyPreviews,
+  getAllReviewsByAdmin,
 };

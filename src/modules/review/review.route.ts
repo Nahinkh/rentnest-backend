@@ -18,5 +18,9 @@ route.delete("/:reviewId",auth(Role.TENANT),reviewController.deleteReview)
 // LandLord
 route.get("/landlord",auth(Role.LANDLORD),reviewController.getLandlordPropertyPreviews);
 
+// Admin
+route.get("/admin/reviews",auth(Role.ADMIN),reviewController.getAllReviewsByAdmin);
+
+
 
 export const reviewRoute =route
