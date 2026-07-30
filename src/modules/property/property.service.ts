@@ -12,7 +12,6 @@ import httpStatus from "http-status";
 const createProperty = async (userId: string, propertyData: IProperty) => {
   return await prisma.$transaction(async (tx) => {
     let category = await categoryService.createCategory(
-      tx,
       propertyData.category,
     );
 
@@ -227,7 +226,6 @@ const updateProperty = async (
     };
     if (category) {
       const categoryResult = await categoryService.createCategory(
-        tx,
         category,
       );
       updateData.category = {
