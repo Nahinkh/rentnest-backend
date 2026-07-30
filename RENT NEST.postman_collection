@@ -1,0 +1,1074 @@
+{
+  "info": {
+    "_postman_id": "371a4229-aeae-40bd-aecd-ce077c8f7072",
+    "name": "RENT NEST Copy",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "33058162"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "  {\r\n    \"name\": \"Admin\",\r\n    \"email\":\"admin@gmail.com\",\r\n    \"password\":\"12345678\"\r\n  }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\":\"admin@gmail.com\",\r\n    \"password\":\"12345678\"\r\n  }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/auth/login",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\":\"nahin@gmail.com\",\r\n    \"password\":\"12345678\"\r\n  }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/auth/refresh-token",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Profile",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\":\"nahin@gmail.com\",\r\n    \"password\":\"12345678\"\r\n  }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/auth/profile",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\":\"nahin@gmail.com\",\r\n    \"password\":\"12345678\"\r\n  }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/logout",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Property",
+      "item": [
+        {
+          "name": "Create Property",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Big Room Space chek with exsiting category\",\r\n  \"description\": \"Suitable Well famaily\",\r\n  \"rentPrice\": 40000,\r\n  \"bedrooms\": 6,\r\n  \"bathrooms\": 2,\r\n  \"area\": 3000,\r\n  \"address\": \"Uttara\",\r\n  \"city\": \"Dhaka\",\r\n  \"division\": \"Dhaka\",\r\n  \"latitude\": 23.7315,\r\n  \"longitude\": 90.4175,\r\n  \"category\": {\r\n    \"name\": \"House\",\r\n    \"description\": \"House space\"\r\n  }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/landlord/properties",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "landlord",
+                "properties"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Properties",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Big Room Space chek with exsiting category check Update\",\r\n  \"description\": \"Suitable Well famaily\",\r\n  \"rentPrice\": 60000,\r\n  \"bedrooms\": 6,\r\n  \"bathrooms\": 2,\r\n  \"area\": 3000,\r\n  \"address\": \"Uttara\",\r\n  \"city\": \"Dhaka\",\r\n  \"division\": \"Dhaka\",\r\n  \"latitude\": 23.7315,\r\n  \"longitude\": 90.4175,\r\n  \"category\": {\r\n    \"name\": \"House\",\r\n    \"description\": \"House space\"\r\n  }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/landlord/properties/802c3d25-0eff-4eb6-9976-7dd2e71db44b",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "landlord",
+                "properties",
+                "802c3d25-0eff-4eb6-9976-7dd2e71db44b"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Property",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"Modern Duplex by Updated with category\",\r\n    \"description\": \"Spacious duplex in a peaceful neighborhood.\",\r\n    \"rentPrice\": \"42000\",\r\n    \"bedrooms\": 4,\r\n    \"bathrooms\": 3,\r\n    \"area\": 2500,\r\n    \"address\": \"Shaheb Bazar\",\r\n    \"city\": \"Rajshahi\",\r\n    \"division\": \"Rajshahi\",\r\n    \"latitude\": 24.3745,\r\n    \"longitude\": 88.6042,\r\n    \"availability\": \"AVAILABLE\",\r\n    \"isDeleted\": false,\r\n    \"category\": {\r\n        \"name\": \"House\",\r\n        \"description\": \"House space\"\r\n    }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/landlord/properties/10808cc8-a245-4329-af51-1919c10df9ce",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "landlord",
+                "properties",
+                "10808cc8-a245-4329-af51-1919c10df9ce"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Properties",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Commercial Office Space chek with exsiting category\",\r\n  \"description\": \"Suitable for startups and IT companies.\",\r\n  \"rentPrice\": 40000,\r\n  \"bedrooms\": 6,\r\n  \"bathrooms\": 2,\r\n  \"area\": 3000,\r\n  \"address\": \"Tejgaon Commercial Area\",\r\n  \"city\": \"Dhaka\",\r\n  \"division\": \"Dhaka\",\r\n  \"latitude\": 23.7315,\r\n  \"longitude\": 90.4175,\r\n  \"category\": {\r\n    \"name\": \"Office\",\r\n    \"description\": \"Commercial office space\"\r\n  }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/landlord/properties?",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "landlord",
+                "properties"
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Property by id",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Commercial Office Space chek with exsiting category\",\r\n  \"description\": \"Suitable for startups and IT companies.\",\r\n  \"rentPrice\": 40000,\r\n  \"bedrooms\": 6,\r\n  \"bathrooms\": 2,\r\n  \"area\": 3000,\r\n  \"address\": \"Tejgaon Commercial Area\",\r\n  \"city\": \"Dhaka\",\r\n  \"division\": \"Dhaka\",\r\n  \"latitude\": 23.7315,\r\n  \"longitude\": 90.4175,\r\n  \"category\": {\r\n    \"name\": \"Office\",\r\n    \"description\": \"Commercial office space\"\r\n  }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/landlord/properties/802c3d25-0eff-4eb6-9976-7dd2e71db44b",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "landlord",
+                "properties",
+                "802c3d25-0eff-4eb6-9976-7dd2e71db44b"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "TENANT",
+      "item": [
+        {
+          "name": "Create Rental",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"propertyId\": \"802c3d25-0eff-4eb6-9976-7dd2e71db44b\",\r\n  \"startDate\": \"2026-08-01\",\r\n  \"durationMonth\": 12,\r\n  \"message\": \"I would like to rent this apartment for one year.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/rentals",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "rentals"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tenant Request",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"propertyId\": \"11173d70-7900-461e-aa01-43c317de0d67\",\r\n  \"startDate\": \"\",\r\n  \"durationMonth\": 12,\r\n  \"message\": \"I would like to rent this apartment for one year.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/rentals",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "rentals"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Property Request By Land Lord",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"propertyId\": \"11173d70-7900-461e-aa01-43c317de0d67\",\r\n  \"startDate\": \"\",\r\n  \"durationMonth\": 12,\r\n  \"message\": \"I would like to rent this apartment for one year.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/rentals/property-request",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "rentals",
+                "property-request"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Request",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"propertyId\": \"11173d70-7900-461e-aa01-43c317de0d67\",\r\n  \"startDate\": \"\",\r\n  \"durationMonth\": 12,\r\n  \"message\": \"I would like to rent this apartment for one year.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/rentals/58154917-299e-40c6-ab71-8e3f20dfd9c5/approve",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "rentals",
+                "58154917-299e-40c6-ab71-8e3f20dfd9c5",
+                "approve"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Request",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"propertyId\": \"11173d70-7900-461e-aa01-43c317de0d67\",\r\n  \"startDate\": \"\",\r\n  \"durationMonth\": 12,\r\n  \"message\": \"I would like to rent this apartment for one year.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/rentals/b195fc9e-2dcc-4a41-a9ad-ae1eef42a3cf/reject",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "rentals",
+                "b195fc9e-2dcc-4a41-a9ad-ae1eef42a3cf",
+                "reject"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Request",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"propertyId\": \"11173d70-7900-461e-aa01-43c317de0d67\",\r\n  \"startDate\": \"\",\r\n  \"durationMonth\": 12,\r\n  \"message\": \"I would like to rent this apartment for one year.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/rentals/58154917-299e-40c6-ab71-8e3f20dfd9c8/cancel",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "rentals",
+                "58154917-299e-40c6-ab71-8e3f20dfd9c8",
+                "cancel"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payment",
+      "item": [
+        {
+          "name": "Payment Intent",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"rentalRequestId\": \"14cc13f3-5bfe-49e3-87bd-09230909834c\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/payments/create-checkout-session",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "payments",
+                "create-checkout-session"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Review",
+      "item": [
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"rentalRequestId\": \"14cc13f3-5bfe-49e3-87bd-09230909834c\",\r\n  \"rating\": 5,\r\n  \"comment\": \"Excellent property. The landlord was very cooperative.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/reviews",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "reviews"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Review",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"rentalRequestId\": \"14cc13f3-5bfe-49e3-87bd-09230909834c\",\r\n  \"rating\": 4.5,\r\n  \"comment\": \"Excellent property. The landlord was very cooperative. updated.......\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/reviews/14c9e467-c54f-46f4-bca5-a6ba068b7ad7",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "reviews",
+                "14c9e467-c54f-46f4-bca5-a6ba068b7ad7"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"rentalRequestId\": \"58154917-299e-40c6-ab71-8e3f20dfd9c5\",\r\n  \"rating\": 3.5,\r\n  \"comment\": \"Excellent property. The landlord was very cooperative. updated.......\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/reviews/14c9e467-c54f-46f4-bca5-a6ba068b7ad7",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "reviews",
+                "14c9e467-c54f-46f4-bca5-a6ba068b7ad7"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Property Review",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"rentalRequestId\": \"58154917-299e-40c6-ab71-8e3f20dfd9c5\",\r\n  \"rating\": 5,\r\n  \"comment\": \"Excellent property. The landlord was very cooperative.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/reviews",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "reviews"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Property By Landlord",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"rentalRequestId\": \"58154917-299e-40c6-ab71-8e3f20dfd9c5\",\r\n  \"rating\": 5,\r\n  \"comment\": \"Excellent property. The landlord was very cooperative.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/reviews/landlord",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "reviews",
+                "landlord"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Reviews by Admin",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/reviews/admin/reviews?status=VISIBLE",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "reviews",
+                "admin",
+                "reviews"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "VISIBLE"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Review Status By Admin",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\":\"VISIBLE\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/reviews/admin/reviews/b18c8780-b184-4b2f-8b60-07c9ee19f745",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "reviews",
+                "admin",
+                "reviews",
+                "b18c8780-b184-4b2f-8b60-07c9ee19f745"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "My Review",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"rentalRequestId\": \"58154917-299e-40c6-ab71-8e3f20dfd9c5\",\r\n  \"rating\": 5,\r\n  \"comment\": \"Excellent property. The landlord was very cooperative.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/reviews/my-reviews",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "reviews",
+                "my-reviews"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/admin/users?",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"ACTIVE\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/admin/users/28e12c6f-2b3f-4f98-98fc-929838ee7221/status",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "28e12c6f-2b3f-4f98-98fc-929838ee7221",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Properties By Admin",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/admin/properties",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "properties"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Rental request By Admin",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/admin/rental-requests",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "rental-requests"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Category By Admin",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"Hill\",\r\n    \"slug\":\"Hill\",\r\n    \"description\":\"This is Create by Admin\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/categories/admin",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "categories",
+                "admin"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Category By Admin",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/categories/admin",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "categories",
+                "admin"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Category By Admin",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"Hill Updated\",\r\n    \"slug\":\"Hill Updated\",\r\n    \"description\":\"This is Updated by Admin\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://rentnest-backend-jcys.onrender.com/api/categories/admin/6121e450-6133-4ee0-90f4-f5fd65de625b",
+              "protocol": "https",
+              "host": [
+                "rentnest-backend-jcys",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "categories",
+                "admin",
+                "6121e450-6133-4ee0-90f4-f5fd65de625b"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Category By Admin",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"Hill Updated\",\r\n    \"slug\":\"Hill Updated\",\r\n    \"description\":\"This is Updated by Admin\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/categories/admin/6121e450-6133-4ee0-90f4-f5fd65de625b",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "categories",
+                "admin",
+                "6121e450-6133-4ee0-90f4-f5fd65de625b"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
