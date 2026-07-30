@@ -42,12 +42,10 @@ app.use("/api/reviews",reviewRoute);
 //   customer: "cus_test",
 // }); 
 // console.log("Stripe configured successfully");
-
-app.use(globalErrorHandler);
-app.use(notFound);
-
 app.get("/",(req : Request, res : Response) => {
     res.send("Hello, World! From RentNest Backend Server");
 });
+app.use(globalErrorHandler);
+app.use(notFound);
 
 export default app;
