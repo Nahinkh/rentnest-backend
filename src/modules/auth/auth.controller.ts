@@ -5,6 +5,8 @@ import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import envConfig from "../../config/envConfig";
 
+
+const isProduction = envConfig.node_env === "production";
 const createUser = catchAsync(async(req:Request, res:Response) => {
     const payload = req.body;
     const result = await authService.registerUser(payload);
@@ -19,17 +21,18 @@ const createUser = catchAsync(async(req:Request, res:Response) => {
 
 const loginUser = catchAsync(async(req:Request, res:Response) => {
     const payload = req.body;
+    const isProduction = envConfig.node_env === "production";
     const {accessToken, refreshToken} = await authService.loginUser(payload);
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
         secure: envConfig.node_env === "production",
-        sameSite: "none",
+        sameSite: isProduction ? "none" : "lax",
         maxAge: 1000 * 60 * 60 * 24, // 1 day
     });
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: envConfig.node_env === "production",
-        sameSite: "none",
+        sameSite: isProduction ? "none" : "lax",
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
     })
     sendResponse(res,{
@@ -53,7 +56,7 @@ const getProfile = catchAsync(async(req:Request, res:Response) => {
     })
 })
 const logout = catchAsync(async (req, res) => {
-  res.clearCookie("refreshToken", {
+  res.clearCookie("accessToken", {
     httpOnly: true,
     secure: envConfig.node_env === "production",
     sameSite:
@@ -76,7 +79,7 @@ const refreshToken = catchAsync(async(req:Request, res:Response) => {
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
         secure: envConfig.node_env === "production",
-        sameSite: "none",
+        sameSite: isProduction ? "none" : "lax",
         maxAge: 1000 * 60 * 60 * 24, // 1 day
     });  
     sendResponse(res,{

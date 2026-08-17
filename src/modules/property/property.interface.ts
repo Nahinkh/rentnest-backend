@@ -19,7 +19,7 @@ export interface IProperty {
   latitude?: number;
   longitude?: number;
 
-  category: ICategory
+  category: string | ICategory;
 }
 
 export interface PropertyFilters {

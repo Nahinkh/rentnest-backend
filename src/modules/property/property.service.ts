@@ -2,72 +2,106 @@ import { Prisma, PropertyStatus } from "../../../generated/prisma/client";
 import { prisma } from "../../db";
 import { PaginationOptions } from "../../interfaces/pagination";
 import AppError from "../../utils/AppError";
+import { deleteImageFromCloudinary, uploadImageToCloudinary } from "../../utils/cloudinary";
 import { paginationCalculate } from "../../utils/pagination";
 import { JwtPayload } from "../auth/auth.interface";
+import { createCategoryHelper } from "../category/category.helper";
 import { categoryService } from "../category/category.service";
 import { propertySearchableFields } from "./property.constant";
-import { IProperty, IUpdateProperty, PropertyFilters } from "./property.interface";
+import {
+  IProperty,
+  IUpdateProperty,
+  PropertyFilters,
+} from "./property.interface";
 import httpStatus from "http-status";
 
-const createProperty = async (userId: string, propertyData: IProperty) => {
-  return await prisma.$transaction(async (tx) => {
-    let category = await categoryService.createCategory(
-      propertyData.category,
-    );
-
-    if (!category) {
-      category = await tx.category.create({
-        data: {
-          name: propertyData.category.name,
-          slug: propertyData.category.name.toLowerCase().replace(/\s+/g, "-"),
-          description: propertyData.category.description || null,
-        },
-      });
+const createProperty = async (
+  userId: string,
+  propertyData: IProperty,
+  files: Express.Multer.File[] = [],
+) => {
+  const uploadImages: {
+    imageUrl: string;
+    publicId: string;
+  }[] = [];
+  try {
+    // Upload images to Cloudinary
+    for (const file of files) {
+      const uploaded = await uploadImageToCloudinary(
+        file.buffer,
+        "rentnest/properties",
+      );
+      uploadImages.push(uploaded);
     }
 
-    const property = await tx.property.create({
-      data: {
-        title: propertyData.title,
-        description: propertyData.description,
-        rentPrice: propertyData.rentPrice,
-        bedrooms: propertyData.bedrooms,
-        bathrooms: propertyData.bathrooms,
-        area: propertyData.area || null,
-        address: propertyData.address,
-        city: propertyData.city,
-        division: propertyData.division,
-        latitude: propertyData.latitude || null,
-        longitude: propertyData.longitude || null,
-        landlord: {
-          connect: {
-            id: userId,
+    // Create property with uploaded images
+    const property = await prisma.$transaction(
+      async (tx) => {
+        let category = await createCategoryHelper(tx, propertyData.category as any);
+        const createdProperty = await tx.property.create({
+          data: {
+            title: propertyData.title,
+            description: propertyData.description,
+            rentPrice: propertyData.rentPrice,
+            bedrooms: propertyData.bedrooms,
+            bathrooms: propertyData.bathrooms,
+            area: propertyData.area,
+            address: propertyData.address,
+            city: propertyData.city,
+            division: propertyData.division,
+            latitude: propertyData.latitude,
+            longitude: propertyData.longitude,
+            
+            category: {
+              connect: {
+                id: category.id,
+              },
+            },
+            landlord: {
+              connect: {
+                id: userId,
+              }
+            },
+            images:{
+              create: uploadImages.map((image) => ({
+                imageUrl: image.imageUrl,
+                publicId: image.publicId, 
+              })),
+          
+            }
           },
-        },
-        category: {
-          connect: {
-            id: category.id,
-          },
-        },
-      },
-      include: {
-        category: true,
-        landlord: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
-    });
+          include: {
+            category: true,
+            landlord: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              }
+            },
+            images: true,
+          }
+        })
+        return createdProperty;
+      }
+    )
     return property;
-  });
+  } catch (error) {
+    // Cleanup uploaded images in case of an error
+    await Promise.allSettled(
+      uploadImages.map((image) => {
+        return deleteImageFromCloudinary(image.publicId);
+      }
+    )
+    )
+    throw error;
+  }
 };
 
 const getAllProperties = async (
   filters: PropertyFilters,
   pagination: PaginationOptions,
-  isAdmin?: boolean
+  isAdmin?: boolean,
 ) => {
   const { page, limit, skip, sortBy, sortOrder } =
     paginationCalculate(pagination);
@@ -78,7 +112,6 @@ const getAllProperties = async (
       isDeleted: false,
     },
   ];
-
 
   // Search term filter
   if (searchTerm) {
@@ -123,7 +156,7 @@ const getAllProperties = async (
     ? { AND: andConditions }
     : {};
 
-    if (!isAdmin) {
+  if (!isAdmin) {
     whereCondition.availability = PropertyStatus.AVAILABLE;
   }
 
@@ -225,9 +258,7 @@ const updateProperty = async (
       ...dataWithoutCategory,
     };
     if (category) {
-      const categoryResult = await categoryService.createCategory(
-        category,
-      );
+      const categoryResult = await categoryService.createCategory(category);
       updateData.category = {
         connect: {
           id: categoryResult.id,
@@ -253,40 +284,42 @@ const updateProperty = async (
 
     return updatedProperty;
   });
-    return updatedProperty;
+  return updatedProperty;
 };
 
 const deleteProperty = async (propertyId: string, user: JwtPayload) => {
-    const property = await prisma.property.findUnique({
-        where: {
-            id: propertyId,
-            isDeleted: false,
-        }
+  const property = await prisma.property.findUnique({
+    where: {
+      id: propertyId,
+      isDeleted: false,
+    },
+  });
 
-    })
+  if (!property) {
+    throw new AppError("Property not found", httpStatus.NOT_FOUND);
+  }
 
-    if (!property) {
-        throw new AppError("Property not found", httpStatus.NOT_FOUND);
-    }
+  if (user.role !== "ADMIN" && property.landlordId !== user.id) {
+    throw new AppError(
+      "You are not authorized to delete this property",
+      httpStatus.FORBIDDEN,
+    );
+  }
 
-    if (user.role !== "ADMIN" && property.landlordId !== user.id) {
-        throw new AppError("You are not authorized to delete this property", httpStatus.FORBIDDEN);
-    }
-
-    const deletedProperty = await prisma.property.update({
-        where: {
-            id: propertyId,
-        },
-        data: {
-            isDeleted: true,
-        },
-    })
-}
+  const deletedProperty = await prisma.property.update({
+    where: {
+      id: propertyId,
+    },
+    data: {
+      isDeleted: true,
+    },
+  });
+};
 
 export const propertyService = {
   createProperty,
   getAllProperties,
   getPropertyById,
   updateProperty,
-  deleteProperty
+  deleteProperty,
 };

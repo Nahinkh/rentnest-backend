@@ -55,6 +55,7 @@ model PropertyImage {
     id String @id @default(uuid())
 
     imageUrl String
+    publicId String
 
     propertyId String
 
@@ -62,5 +63,6 @@ model PropertyImage {
 
     createdAt DateTime @default(now())
 
+    @@index([propertyId])
     @@map("property_images")
 }
