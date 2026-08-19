@@ -63,6 +63,51 @@ const createPaymentIntent = async (
     currency: "BDT",
   };
 };
+// Helper function to create a Stripe Checkout Session
+const handleSuccessfulPayment = async (
+  transactionId: string,
+  paymentMethod: PaymentMethod,
+) => {
+  const payment = await prisma.payment.findUnique({
+    where: {
+      transactionId,
+    },
+    include: {
+      rentalRequest: true,
+    },
+  });
+
+  if (!payment) {
+    return;
+  }
+
+  // Stripe can retry webhooks
+  if (payment.status === PaymentStatus.SUCCESS) {
+    return;
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.payment.update({
+      where: {
+        id: payment.id,
+      },
+      data: {
+        status: PaymentStatus.SUCCESS,
+        paymentMethod,
+        paidAt: new Date(),
+      },
+    });
+
+    await tx.property.update({
+      where: {
+        id: payment.rentalRequest.propertyId,
+      },
+      data: {
+        availability: PropertyStatus.RENTED,
+      },
+    });
+  });
+};
 
 const createCheckoutSession = async (
   payload: ICreatePaymentIntent,
@@ -105,88 +150,63 @@ const stripeWebhook = async (req: Request) => {
 
   switch (event.type) {
     case "checkout.session.completed": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const payment = await prisma.payment.findUnique({
-        where: {
-          transactionId: session.id,
-        },
-        include: {
-          rentalRequest: true,
-        },
-      });
+      const session =
+        event.data.object as Stripe.Checkout.Session;
 
-      if (!payment) {
-        return {
-          received: true,
-        };
+      if (!session.payment_intent) {
+        break;
       }
 
-      // Prevent duplicate processing if Stripe retries the webhook
-      if (payment.status === PaymentStatus.SUCCESS) {
-        return {
-          received: true,
-        };
+      const paymentIntent =
+        await stripe.paymentIntents.retrieve(
+          session.payment_intent as string,
+        );
+
+      const stripePaymentMethod =
+        paymentIntent.payment_method
+          ? await stripe.paymentMethods.retrieve(
+              paymentIntent.payment_method as string,
+            )
+          : null;
+
+      let paymentMethod =
+        PaymentMethod.CARD;
+
+      if (
+        stripePaymentMethod?.type === "card"
+      ) {
+        paymentMethod = PaymentMethod.CARD;
       }
 
-      // Retrieve PaymentIntent
-      const paymentIntent = await stripe.paymentIntents.retrieve(
-        session.payment_intent as string,
+      await handleSuccessfulPayment(
+        session.id,
+        paymentMethod,
       );
 
-      // Retrieve Payment Method
-      const stripePaymentMethod = await stripe.paymentMethods.retrieve(
-        paymentIntent.payment_method as string,
+      break;
+    }
+
+    case "payment_intent.succeeded": {
+      const paymentIntent =
+        event.data.object as Stripe.PaymentIntent;
+
+      await handleSuccessfulPayment(
+        paymentIntent.id,
+        PaymentMethod.CARD,
       );
-
-      let paymentMethod: PaymentMethod;
-      switch (stripePaymentMethod.type) {
-        case "card":
-          paymentMethod = PaymentMethod.CARD;
-          break;
-
-        default:
-          paymentMethod = PaymentMethod.CARD;
-          break;
-      }
-      try {
-        console.log("Updating payment...");
-        await prisma.$transaction([
-          prisma.payment.update({
-            where: {
-              id: payment.id,
-            },
-            data: {
-              status: PaymentStatus.SUCCESS,
-              paymentMethod,
-              paidAt: new Date(),
-            },
-          }),
-
-          prisma.property.update({
-            where: {
-              id: payment.rentalRequest.propertyId,
-            },
-            data: {
-              availability: PropertyStatus.RENTED,
-            },
-          }),
-        ]);
-        console.log("Payment updated successfully");
-      } catch (error) {
-        console.error(error);
-        throw error;
-      }
 
       break;
     }
 
     default:
+      break;
   }
 
   return {
     received: true,
   };
 };
+
 
 export const paymentService = {
   createPaymentIntent,

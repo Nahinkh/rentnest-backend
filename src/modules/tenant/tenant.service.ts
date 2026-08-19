@@ -3,6 +3,7 @@ import { prisma } from "../../db";
 import AppError from "../../utils/AppError";
 import httpStatus from "http-status";
 import {
+  PaymentStatus,
   PropertyStatus,
   RentalRequestStatus,
 } from "../../../generated/prisma/enums";
@@ -111,6 +112,50 @@ const getRentalRequestsByTenant = async (tenantId: string) => {
   });
   return rentalRequests;
 };
+const getCurrentRental = async (tenantId: string) => {
+  const currentRental = await prisma.rentalRequest.findFirst({
+    where: {
+      tenantId,
+
+      status: RentalRequestStatus.APPROVED,
+
+      payment: {
+        status: PaymentStatus.SUCCESS,
+      },
+
+      property: {
+        isDeleted: false,
+        availability: PropertyStatus.RENTED,
+      },
+    },
+
+    include: {
+      payment: true,
+
+      property: {
+        include: {
+          category: true,
+
+          images: true,
+
+          landlord: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      },
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return currentRental;
+};
 
 const getPropertyRequest = async (landlordId: string) => {
   const request = await prisma.rentalRequest.findMany({
@@ -191,14 +236,14 @@ const approveRentalRequest = async (requestId: string, user: JwtPayload) => {
     });
 
     // Mark Property is Rented
-    await tx.property.update({
-      where: {
-        id: rentalRequest.propertyId,
-      },
-      data: {
-        availability: PropertyStatus.RENTED,
-      },
-    });
+    // await tx.property.update({
+    //   where: {
+    //     id: rentalRequest.propertyId,
+    //   },
+    //   data: {
+    //     availability: PropertyStatus.RENTED,
+    //   },
+    // });
     // Reject All Request
     await tx.rentalRequest.updateMany({
       where: {
@@ -206,7 +251,7 @@ const approveRentalRequest = async (requestId: string, user: JwtPayload) => {
         id: {
           not: requestId,
         },
-        status: RentalRequestStatus.REJECTED,
+        status: RentalRequestStatus.PENDING,
       },
       data: {
         status: RentalRequestStatus.REJECTED,
@@ -372,6 +417,7 @@ export const tenantService = {
   createRentalRequest,
   getRentalRequestsByTenant,
   getPropertyRequest,
+  getCurrentRental,
   approveRentalRequest,
   rejectRentalRequest,
   cancelRentalRequest,

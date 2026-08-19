@@ -8,6 +8,7 @@ const route = Router();
 // Tenant Routes
 route.post("/",auth(), tenantController.createRentalRequest);
 route.get("/",auth(), tenantController.getRentalRequestsByTenant);
+route.get("/current-rental",auth(Role.TENANT), tenantController.getCurrentRental);
 // Landlord Routes
 route.get("/property-request",auth(Role.LANDLORD), tenantController.getPropertyRequest);
 route.patch("/:id/approve",auth(Role.LANDLORD), tenantController.approveRentalRequest);

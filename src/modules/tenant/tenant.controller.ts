@@ -32,6 +32,17 @@ const getRentalRequestsByTenant = catchAsync(async (req: Request, res: Response)
     });
 })
 
+const getCurrentRental = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as JwtPayload;
+    const currentRental = await tenantService.getCurrentRental(user.id);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: currentRental ? "Current rental retrieved successfully" : "No current rental found",
+        data: currentRental
+    });
+});
+
 const getPropertyRequest = catchAsync(async(req:Request,res:Response)=>{
     const request = await tenantService.getPropertyRequest(req.user.id)
     sendResponse(res, {
@@ -80,6 +91,7 @@ const cancelRentalRequest  = catchAsync(async(req:Request,res:Response)=>{
 export const tenantController = {
   createRentalRequest,
   getRentalRequestsByTenant,
+  getCurrentRental,
   getPropertyRequest,
   approveRentalRequest,
   rejectRentalRequest,

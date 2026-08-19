@@ -30,7 +30,7 @@ app.use(cookieParser());
 app.use("/api/auth",authRoutes);
 app.use("/api/landlord/properties", propertyRoute);
 app.use("/api/admin", adminRoute);
-app.use("/api/rentals",tenantRoute);
+app.use("/api/tenant",tenantRoute);
 app.use("/api/categories", categoryRoute);
 app.use("/api/payments",paymentRoute);
 app.use("/api/reviews",reviewRoute);
