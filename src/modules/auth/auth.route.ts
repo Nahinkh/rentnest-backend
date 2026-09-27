@@ -6,10 +6,16 @@ import auth from "../../middleware/auth";
 
 const router = Router();
 
-router.post("/register",validateRequest(validateRegister), authController.createUser)
-router.post("/login",validateRequest(validateLogin), authController.loginUser)
-router.post("/refresh-token", authController.refreshToken)
-router.get("/profile",auth(), authController.getProfile)
-router.post("/logout", auth(), authController.logout)
+router.post(
+  "/register",
+  validateRequest(validateRegister),
+  authController.createUser,
+);
+router.post("/login", validateRequest(validateLogin), authController.loginUser);
+router.post("/refresh-token", authController.refreshToken);
+router.get("/profile", auth(), authController.getProfile);
+router.post("/logout", auth(), authController.logout);
+router.patch("/profile", auth(), authController.updateProfile);
+router.post("/apply-landlord", auth(), authController.applyAsLandlord);
 
 export const authRoutes = router;

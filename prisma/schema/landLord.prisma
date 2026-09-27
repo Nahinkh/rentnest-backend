@@ -1,0 +1,21 @@
+model LandlordApplication {
+  id String @id @default(uuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  reason           String?
+  additionalInfo   String?
+
+  status           LandlordApplicationStatus @default(PENDING)
+
+  reviewedById     String?
+  reviewedAt       DateTime?
+  rejectionReason  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}

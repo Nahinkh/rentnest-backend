@@ -1,25 +1,29 @@
 model User {
-    id          String   @id @default(uuid())
-  name        String   @db.VarChar(255)
-  email       String   @unique @db.VarChar(255)
-  password    String   @db.VarChar(255)
-  phone       String?  @db.VarChar(20)
-  avatarUrl   String?  @db.VarChar(500)
+  id        String  @id @default(uuid())
+  name      String  @db.VarChar(255)
+  email     String  @unique @db.VarChar(255)
+  password  String  @db.VarChar(255)
+  phone     String? @db.VarChar(20)
+  avatarUrl String? @db.VarChar(500)
 
-  role        Role     @default(TENANT)
-  status      Status   @default(ACTIVE)
+  division  String? @db.VarChar(100)
+  district  String? @db.VarChar(100)
+  city      String? @db.VarChar(100)
+  address   String? @db.VarChar(500)
 
-  isDeleted   Boolean  @default(false)
+  role      Role   @default(TENANT)
+  status    Status @default(ACTIVE)
+  isDeleted Boolean @default(false)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  properties       Property[]
-  rentalRequests   RentalRequest[]
-  payments         Payment[]
-  reviews          Review[]
+  landlordApplication LandlordApplication?
+  properties          Property[]
+  rentalRequests      RentalRequest[]
+  payments            Payment[]
+  reviews             Review[]
 
   @@map("users")
 }
-

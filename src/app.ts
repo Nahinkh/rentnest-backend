@@ -34,14 +34,6 @@ app.use("/api/tenant",tenantRoute);
 app.use("/api/categories", categoryRoute);
 app.use("/api/payments",paymentRoute);
 app.use("/api/reviews",reviewRoute);
-
-
-
-// Check Stripe is connected
-// const paymentMethods = await stripe.paymentMethods.list({
-//   customer: "cus_test",
-// }); 
-// console.log("Stripe configured successfully");
 app.get("/",(req : Request, res : Response) => {
     res.send("Hello, World! From RentNest Backend Server");
 });

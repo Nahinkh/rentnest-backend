@@ -8,12 +8,17 @@ enum Status {
   ACTIVE
   BLOCKED
 }
+enum LandlordApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
 
 enum PropertyStatus {
   AVAILABLE
   RENTED
   UNAVAILABLE
-}
+} 
 
 enum RentalRequestStatus {
   PENDING

@@ -6,8 +6,8 @@ import { Role } from "../../../generated/prisma/enums";
 const route = Router();
 
 // Tenant Routes
-route.post("/",auth(), tenantController.createRentalRequest);
-route.get("/",auth(), tenantController.getRentalRequestsByTenant);
+route.post("/",auth(Role.TENANT), tenantController.createRentalRequest);
+route.get("/",auth(Role.TENANT), tenantController.getRentalRequestsByTenant);
 route.get("/current-rental",auth(Role.TENANT), tenantController.getCurrentRental);
 // Landlord Routes
 route.get("/property-request",auth(Role.LANDLORD), tenantController.getPropertyRequest);
