@@ -143,6 +143,16 @@ const getDashboardStats = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getLandlordApplicationHistory = catchAsync(async (req, res) => {
+  const result = await adminService.getLandlordApplicationHistory();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Landlord application history retrieved successfully",
+    data: result,
+  });
+});
 
 export const adminController = {
   getAllUsersByAdmin,
@@ -152,4 +162,5 @@ export const adminController = {
   getDashboardStats,
   getLandlordApplications,
   reviewLandlordApplication,
+  getLandlordApplicationHistory,
 };

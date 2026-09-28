@@ -36,4 +36,9 @@ route.patch(
   auth(Role.ADMIN),
   adminController.reviewLandlordApplication,
 );
+route.get(
+  "/landlord-applications/history",
+  auth(Role.ADMIN),
+  adminController.getLandlordApplicationHistory,
+);
 export const adminRoute = route;

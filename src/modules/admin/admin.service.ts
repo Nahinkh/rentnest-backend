@@ -241,6 +241,35 @@ const getDashboardStats = async () => {
     totalPayments,
   };
 };
+const getLandlordApplicationHistory = async () => {
+  const applications = await prisma.landlordApplication.findMany({
+    where: {
+      status: {
+        in: ["APPROVED", "REJECTED"],
+      },
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          avatarUrl: true,
+          division: true,
+          district: true,
+          city: true,
+          address: true,
+        },
+      },
+    },
+    orderBy: {
+      reviewedAt: "desc",
+    },
+  });
+
+  return applications;
+};
 
 export const adminService = {
   getAllUsers,
@@ -249,4 +278,5 @@ export const adminService = {
   getDashboardStats,
   getLandlordApplications,
   reviewLandlordApplication,
+  getLandlordApplicationHistory
 };
