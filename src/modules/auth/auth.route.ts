@@ -14,6 +14,7 @@ router.post(
 router.post("/login", validateRequest(validateLogin), authController.loginUser);
 router.post("/refresh-token", authController.refreshToken);
 router.get("/profile", auth(), authController.getProfile);
+router.get("/landlord-application", auth(), authController.getLandLordApplication);
 router.post("/logout", auth(), authController.logout);
 router.patch("/profile", auth(), authController.updateProfile);
 router.post("/apply-landlord", auth(), authController.applyAsLandlord);

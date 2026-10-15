@@ -199,6 +199,15 @@ const applyAsLandlord = async (
   return application;
 };
 
+const getLandLordApplication= async (userId: string) => {
+  const application = await prisma.landlordApplication.findUnique({
+    where: {
+      userId,
+    },
+  });
+  return application;
+};
+
 const refreshToken = async (token: string) => {
   if (!token) {
     throw new AppError("Refresh token is required", httpStatus.BAD_REQUEST);
@@ -233,4 +242,5 @@ export const authService = {
   getProfile,
   updateProfile,
   applyAsLandlord,
+  getLandLordApplication,
 };

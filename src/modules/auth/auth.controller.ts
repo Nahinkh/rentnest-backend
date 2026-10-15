@@ -90,6 +90,15 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getLandLordApplication = catchAsync(async (req: Request, res: Response) => {
+  const application = await authService.getLandLordApplication(req.user.id);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Landlord application fetched successfully",
+    data: application,
+  });
+});
 const applyAsLandlord = catchAsync(async (req: Request, res: Response) => {
   const { reason, additionalInfo } = req.body;
 
@@ -144,4 +153,5 @@ export const authController = {
   logout,
   updateProfile,
   applyAsLandlord,
+  getLandLordApplication,
 };
